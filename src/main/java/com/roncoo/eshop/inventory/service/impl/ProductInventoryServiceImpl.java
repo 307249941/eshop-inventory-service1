@@ -39,7 +39,22 @@ public class ProductInventoryServiceImpl implements ProductInventoryService {
 	}
 
 	public ProductInventory findById(Long id) {
+		// 先从redis里面查，如果没有再从mysql里面查，查到了以后再刷新回redis
+		// 大家想一想，有没有觉得这个场景似曾相识啊
+		// 这不就是我们之前讲解的那个mysql+redis双写一致性的问题场景+解决方案
 		return productInventoryMapper.findById(id);
+	}
+	
+	public ProductInventory findByProductId(Long productId) {
+		Jedis jedis = jedisPool.getResource();
+		String dataJSON = jedis.get("product_inventory_" + productId);
+		if(dataJSON != null && !"".equals(dataJSON)) {
+			JSONObject dataJSONObject = JSONObject.parseObject(dataJSON);
+			dataJSONObject.put("id", "-1");  
+			return JSONObject.parseObject(dataJSONObject.toJSONString(), ProductInventory.class);
+		} else {
+			return productInventoryMapper.findByProductId(productId);
+		}
 	}
 
 }

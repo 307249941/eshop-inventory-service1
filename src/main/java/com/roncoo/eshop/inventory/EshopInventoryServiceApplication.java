@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
 
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
@@ -24,7 +23,7 @@ public class EshopInventoryServiceApplication {
 		config.setMaxIdle(5);
 		config.setMaxWaitMillis(1000 * 10); 
 		config.setTestOnBorrow(true);
-		return new JedisPool(config, "localhost", 6379);
+		return new JedisPool(config, "192.168.1.111", 1111);
 	}
 	
 }
